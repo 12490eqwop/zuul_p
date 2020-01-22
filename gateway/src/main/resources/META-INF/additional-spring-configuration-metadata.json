@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "zuul.routes.user-service.url",
+      "type": "java.lang.String",
+      "description": "Description for zuul.routes.user-service.url."
+    },
+    {
+      "name": "ribbon.eureka.enabled",
+      "type": "java.lang.String",
+      "description": "Description for ribbon.eureka.enabled."
+    }
+  ] }
