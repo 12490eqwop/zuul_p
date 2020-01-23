@@ -83,14 +83,14 @@ public class ServiceBase {
         String vipAddress = configInstance.getStringProperty("eureka.vipAddress", "sampleservice1.mydomain.net").get();
         System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡvipAddressㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
         System.out.println("vipAddress : " + vipAddress);
-        System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+
         InstanceInfo nextServerInfo = null;
         while (nextServerInfo == null) {
             try {
                 nextServerInfo = eurekaClient.getNextServerFromEureka(vipAddress, false);
             } catch (Throwable e) {
                 System.out.println("Waiting ... verifying service registration with eureka ...");
-                System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+
 
                 try {
                     Thread.sleep(3000);
