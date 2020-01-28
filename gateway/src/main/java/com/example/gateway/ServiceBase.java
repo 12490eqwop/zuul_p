@@ -31,6 +31,7 @@ public class ServiceBase {
     @PostConstruct//스프링에 의해 instance생성 후 @PostConstruct 이 적용된 메서드 호출
     public void start() {
         System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+
         System.out.println("Registering service to eureka with STARTING status");
         System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
         applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.STARTING);

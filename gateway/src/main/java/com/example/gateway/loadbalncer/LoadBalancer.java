@@ -57,4 +57,7 @@ public class LoadBalancer {
         return server.getHost()+":"+server.getPort();
     }
 
+    public void test(){
+
+    }
 }

@@ -57,7 +57,6 @@ public class GatewayApplication implements ServletContextListener {
         return eurekaClient;
     }
 
-
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         // mocks monitoring infrastructure as we don't need it for this simple app
@@ -82,10 +81,18 @@ public class GatewayApplication implements ServletContextListener {
 
     public static void main(String[] args) {
 
+
+
+
+
+
+
         //ystem.setProperties();
 
         Properties p = System.getProperties();
         p.put("archaius.configurationSource.additionalUrls","file:///C:\\Users\\DIR-P-0076\\Desktop\\zuul\\gateway\\target\\classes\\eureka-client.properties");
+//        p.put("archaius.configurationSource.additionalUrls","file:///../../../classes\\eureka-client.properties");
+
         p.put("archaius.fixedDelayPollingScheduler.delayMills","3000");
 
 
@@ -99,14 +106,14 @@ public class GatewayApplication implements ServletContextListener {
 
         DynamicPropertyFactory configInstance = com.netflix.config.DynamicPropertyFactory.getInstance();
         ApplicationInfoManager applicationInfoManager = initializeApplicationInfoManager(new MyDataCenterInstanceConfig());
-        EurekaClient eurekaClient = initializeEurekaClient(applicationInfoManager, new DefaultEurekaClientConfig());
+//        EurekaClient eurekaClient = initializeEurekaClient(applicationInfoManager, new DefaultEurekaClientConfig()); //잠시 유레카 서버 없을떄 로그확인 편하게 하기위해 주석처리
 
-        ServiceBase serviceBase = new ServiceBase(applicationInfoManager, eurekaClient, configInstance);
-        try {
-            serviceBase.start();
-        } finally {
-            // the stop calls shutdown on eurekaClient
-            //serviceBase.stop();
-        }
+//        ServiceBase serviceBase = new ServiceBase(applicationInfoManager, eurekaClient, configInstance);
+//        try {
+//            serviceBase.start();
+//        } finally {
+//            // the stop calls shutdown on eurekaClient
+//            //serviceBase.stop();
+//        }
     }
 }
