@@ -79,7 +79,7 @@ public class RouteFilter extends ZuulFilter {
         List<DiscoveryEnabledServer> service2_List = list2.getInitialListOfServers();
 
 
-        //properties에서 가져온  serverlist 담기위한 리스트
+        //properties에서 가져온  serverlist 담기위한 리스트  ,,,,, 아래 serverlist 참고하면 더 좋은 방법있음 RestClient 를 이용하는 방법
         List<String> service1_ListString = Arrays.asList(DSP.get().split(","));
         List<Server> service1_List_U = new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class RouteFilter extends ZuulFilter {
 
         BaseLoadBalancer lb = new BaseLoadBalancer();
         LoadBalancer loadBalancer = new LoadBalancer();
-        Server server;
+        Server server = null;
 
         if (service1_List.size() == 0) { // eureka server에 client 정보들이 없을 때 properties의 내용을 가져옴
             for (int i = 0; i < service1_ListString.size(); i++) {
@@ -109,7 +109,8 @@ public class RouteFilter extends ZuulFilter {
             loadBalancer.GetServerList(service1_List, lb);
         }
 
-
+//이 방식은 만들어진 로드밸런서에 setRule을 통해 rule을 변경해준다는 느낌
+//아래에서 사용할 방식은 로드밸런서를 만들 때 같이 rule을 추가시켜준다는 느낌으로 이해햐자.
 //        System.out.println("====WeightedResponseTime 방식====");
 //        server = loadBalancer.Choose_WeightedResponseTime(lb);
 //        System.out.println(server);
@@ -122,8 +123,13 @@ public class RouteFilter extends ZuulFilter {
 //        server = loadBalancer.Choose_RoundRobin(lb);
 //        System.out.println(server);
 
+
+        System.out.println(loadBalancer.GetURL(server));
+        System.out.println("====출력 화면 메세지====");
+        System.out.println(restTemplate.getForObject(loadBalancer.GetURL(server), String.class));
+
 //
-        System.out.println("=============");
+        ///======01/28날짜=================================
 
         try {
             ConfigurationManager.loadPropertiesFromResources("eureka-client.properties");
@@ -131,8 +137,11 @@ public class RouteFilter extends ZuulFilter {
             e.printStackTrace();
         }
 
+
+        //RestClient 를 이용해 properties의 서버 리스트를 가져오는 방법.
         System.out.println(ConfigurationManager.getConfigInstance().getProperty("eureka-client.ribbon.listOfServers"));
             RestClient client = (RestClient) ClientFactory.getNamedClient("eureka-client");
+            List<Server> serverList = client.getLoadBalancer().getAllServers();
 
         try {
 
@@ -147,11 +156,33 @@ public class RouteFilter extends ZuulFilter {
         } catch (URISyntaxException | ClientException e) {
             e.printStackTrace();
         }
+///////////RoundRobinRuleㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+        BaseLoadBalancer roundRobinLoadBalancer = LoadBalancerBuilder.newBuilder().withRule(new RoundRobinRule()).buildFixedServerListLoadBalancer(serverList);
+
+        System.out.println("=====RoundRobinRule=====");
+        for (int i = 0; i < serverList.size(); i++) {
+            System.out.println(roundRobinLoadBalancer.choose(serverList.get(i)));
+        }
 
 
-        System.out.println(loadBalancer.GetURL(server));
-        System.out.println("====출력 화면 메세지====");
-        System.out.println(restTemplate.getForObject(loadBalancer.GetURL(server), String.class));
+
+/////////Best Available Ruleㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+        BaseLoadBalancer bestAvailableLoadBalancer = LoadBalancerBuilder.newBuilder().withRule(new BestAvailableRule()).buildFixedServerListLoadBalancer(serverList);
+
+        System.out.println("=====bestAvailableLoadBalancer=====");
+        for (int i = 0; i < serverList.size(); i++) {
+            ServerStats stats = bestAvailableLoadBalancer.getLoadBalancerStats().getSingleServerStat(serverList.get(i));
+            // Request Connection을 인위적으로 증가시킨다.
+            for (int j = 0; j < 10 - i; j++) {
+                stats.incrementActiveRequestsCount();
+            }
+            System.out.print("Stats : " + stats.toString());
+        }
+
+        // Active Connection이 가장 낮은 서버를 선택한다.
+        System.out.println("\nChosen Server : " + bestAvailableLoadBalancer.choose(null));
 
 
         return null;
